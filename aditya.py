@@ -1,38 +1,38 @@
-import Serial
+import random
 import time
 
-# Initialize serial connection (change the port name as per your setup)
-ser = serial.Serial('COM3', 9600, timeout=1)
-time.sleep(2)  # Wait for the serial connection to initialize
+# Function to simulate reading the soil moisture level (0-100)
+def read_soil_moisture():
+    return random.randint(0, 100)  # Random value between 0 (dry) and 100 (wet)
 
-def control_water_pump(soil_moisture):
-    # Threshold for soil moisture
-    moisture_threshold = 300
-    if soil_moisture < moisture_threshold:
-        print("Turning on the water pump.")
-        ser.write(b'1')  # Sending signal to Arduino to turn on the relay
+# Function to simulate getting weather forecast data (0-100 for chance of rain)
+def get_weather_forecast():
+    return random.randint(0, 100)  # Chance of rain (0 = no rain, 100 = heavy rain)
+
+# Function to turn the irrigation system on or off
+def control_irrigation(on):
+    if on:
+        print("Irrigation ON: Watering the plants...")
     else:
-        print("Turning off the water pump.")
-        ser.write(b'0')  # Sending signal to Arduino to turn off the relay
+        print("Irrigation OFF: No need to water the plants.")
 
+# Main function to simulate the irrigation system
+def smart_irrigation():
+    soil_moisture = read_soil_moisture()
+    weather_forecast = get_weather_forecast()
+
+    print(f"Current Soil Moisture: {soil_moisture}%")
+    print(f"Weather Forecast (Chance of Rain): {weather_forecast}%")
+
+    # Decision logic to turn on irrigation
+    if soil_moisture < 30 and weather_forecast < 50:
+        control_irrigation(True)  # Water the plants if soil is dry and no rain expected
+    elif soil_moisture > 70 or weather_forecast > 50:
+        control_irrigation(False)  # Don't water if soil is wet or rain is likely
+    else:
+        print("Soil moisture is adequate. No irrigation needed.")
+    
+# Simulate the system running every 5 seconds (for example)
 while True:
-    try:
-        # Read data from serial
-        data = ser.readline().decode().strip()
-        if data:
-            print(data)
-            # Parse the data
-            parts = data.split(',')
-            humidity = float(parts[0].split(': ')[1].strip(' %'))
-            temperature = float(parts[1].split(': ')[1].strip(' *C'))
-            soil_moisture = int(parts[2].split(': ')[1])
-
-            # Control the water pump based on soil moisture
-            control_water_pump(soil_moisture)
-
-        time.sleep(2)  # Wait before reading again
-
-    except Exception as e:
-        print(f"Error: {e}")
-
-ser.close()
+    smart_irrigation()
+    time.sleep(5)  # Wait for 5 seconds before checking again
