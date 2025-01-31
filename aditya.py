@@ -1,4 +1,4 @@
-import serial
+import Serial
 import time
 
 # Initialize serial connection (change the port name as per your setup)
